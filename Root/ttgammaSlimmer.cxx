@@ -51,19 +51,18 @@ void m_add_branches(
 
 int main(int argc, char** argv)
 {
-  gROOT->ProcessLine( "gErrorIgnoreLevel = kFatal;");
+  //gROOT->ProcessLine( "gErrorIgnoreLevel = kFatal;");
   std::cout << "Found " << argc-1 << " files to run over:" << std::endl;
 
   // string path = "root://eosuser//eos/user/j/jwsmith2/reprocessedNtuples/v009_flattened/CR1S/";
-  string path = "/eos/user/j/jwsmith2/reprocessedNtuples/v009_flattened/CR1S/";
+  string path = "/eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v009_flattened/CR1S/";
 
   string channels[] ={"mujets"};
-  //string channels[] ={"emu","mumu","ee"};
   // Where we save to:
   // Remember to make the directory. I.e. mkdir ../SR1 ; cd ../SR1 ; mkdir emu mumu etc
   // I'm just too lazy.
   // string outputPath = "root://eosatlas//eos/atlas/user/j/jwsmith/reprocessedNtuples/v009_flattened/SR1S/";
-  string outputPath = "/eos/atlas/user/j/jwsmith/reprocessedNtuples/v009_flattened/SR1S/";
+  string outputPath = "/eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v009_flattened/SR1S/";
 
 
   for (int i = 1; i < argc; ++i) {
@@ -72,8 +71,6 @@ int main(int argc, char** argv)
 
       TFile *newfile=nullptr;
       TFile *oldFile=nullptr;
-      TTree *newtree_nominal=nullptr;
-      TChain *fChain_nominal=nullptr;
 
       string filename = argv[i];
       string file = path+c+"/"+filename;
@@ -102,13 +99,13 @@ int main(int argc, char** argv)
         // cut="((mujets_2015 && (HLT_mu20_iloose_L1MU15 || HLT_mu50)) || (mujets_2016 && ((HLT_mu24 && mu_pt[0] < 51000.) || (HLT_mu50 && mu_pt[0] > 51000.))))";
       }
       if (c.find("ee") != std::string::npos) {
-        cut="selph_index1 >=0 && event_ngoodphotons == 1 && event_nbjets77 >= 1 && met_met > 30000 && (event_mll < 85000 || event_mll > 95000) && (ph_mgammaleptlept[selph_index1] < 85000 || ph_mgammaleptlept[selph_index1] > 95000) && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
+        cut="selph_index1 >=0 && event_ngoodphotons == 1 && event_njets >= 2 && event_nbjets77 >= 1 && met_met > 30000 && (event_mll < 85000 || event_mll > 95000) && (ph_mgammaleptlept[selph_index1] < 85000 || ph_mgammaleptlept[selph_index1] > 95000) && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
       }
       if (c.find("emu") != std::string::npos) {
-        cut="selph_index1 >=0 && event_ngoodphotons == 1 && event_nbjets77 >= 1 && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
+        cut="selph_index1 >=0 && event_ngoodphotons == 1 && event_njets >= 2 && event_nbjets77 >= 1 && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
       }
       if (c.find("mumu") != std::string::npos) {
-        cut="selph_index1 >=0 && event_ngoodphotons == 1 && event_nbjets77 >= 1 && met_met > 30000 && (event_mll < 85000 || event_mll > 95000) && (ph_mgammaleptlept[selph_index1] < 85000 || ph_mgammaleptlept[selph_index1] > 95000) && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
+        cut="selph_index1 >=0 && event_ngoodphotons == 1 && event_njets >= 2 && event_nbjets77 >= 1 && met_met > 30000 && (event_mll < 85000 || event_mll > 95000) && (ph_mgammaleptlept[selph_index1] < 85000 || ph_mgammaleptlept[selph_index1] > 95000) && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
       }
 
       TCut overlapRemoval;
@@ -124,39 +121,7 @@ int main(int argc, char** argv)
         overlapRemoval="";
       }
 
-      newfile = new TFile((newpath.c_str()), "update");
-      // Nominal tree
-      if (filename.find("QCDfakes") != std::string::npos) {
-        fChain_nominal = new TChain("nominal_Loose");
-      }
-      else {
-        fChain_nominal = new TChain("nominal");
-      }
- 
-      fChain_nominal->Add((file).c_str());
-
-      fChain_nominal->Draw(">>entrylist_nominal",cut&&overlapRemoval,"entrylist_nominal");
-      TEntryList *elist_nominal = (TEntryList*)gDirectory->Get("entrylist_nominal");
- 
-      fChain_nominal->SetEntryList(elist_nominal);
-      newtree_nominal = fChain_nominal->CloneTree(0);
-      if(fChain_nominal->GetEntries() == 0){
-        std::cout<<"No events, is this an error? Skipping..."<<std::endl;
-        continue;
-      }
-
-      printf("#################################################\n");
-      printf("Currently working on nominal tree (outside loop) \n");
-      printf("#################################################\n");
-      m_add_branches(fChain_nominal,elist_nominal,newtree_nominal, filename);
-
-      newfile->cd();
-      newtree_nominal->Write();
-      delete newtree_nominal;
-      delete fChain_nominal;
-      delete elist_nominal;
-
-
+      newfile = new TFile((newpath.c_str()), "recreate");
       oldFile = new TFile((file.c_str()), "read");
 
       TList* list = oldFile->GetListOfKeys() ;
@@ -165,14 +130,22 @@ int main(int argc, char** argv)
       TKey* key ;
       TObject* obj ;
           
-      while ( key = (TKey*)next() ) {
+      std::string oldkeyname;
+
+      while ( (key = (TKey*)next() )) {
+
+        bool alreadyseen = (oldkeyname == key->GetName());
+
+        if (alreadyseen){
+          continue;
+        }
+        oldkeyname = key->GetName();
 
         TChain *fChain=nullptr;
         TTree *newtree=nullptr;
 
         obj = key->ReadObj() ;
-        if ( (strcmp(obj->IsA()->GetName(),"TTree")!=0) || (strcmp("sumWeights",obj->GetName()) == 0) 
-          || (strcmp("nominal",obj->GetName()) == 0) ) {
+        if ( (strcmp(obj->IsA()->GetName(),"TTree")!=0) || (strcmp("sumWeights",obj->GetName()) == 0)) {
           printf("Not running over: %s \n",obj->GetName()); continue; 
         }
         printf("#####################################\n");
@@ -181,7 +154,7 @@ int main(int argc, char** argv)
 
         fChain = new TChain(obj->GetName());
         fChain->Add((file).c_str());
-
+        newfile->cd(); // Make sure we are in new file otherwise shit breaks.
     
         fChain->Draw(">>entrylist",cut&&overlapRemoval,"entrylist");
         TEntryList *elist = (TEntryList*)gDirectory->Get("entrylist");
@@ -190,6 +163,8 @@ int main(int argc, char** argv)
         newtree = fChain->CloneTree(0);
         if(fChain->GetEntries() == 0){
           std::cout<<"No events, is this an error? Skipping..."<<std::endl;
+          delete newtree;
+          delete fChain;
           continue;
         }
         m_add_branches(fChain,elist,newtree, filename);
