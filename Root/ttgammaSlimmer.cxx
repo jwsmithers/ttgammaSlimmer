@@ -38,7 +38,8 @@ void m_add_branches(
       total_events = total_events + 1 * (weight_mc * weight_pileup
           * weight_bTagSF_Continuous * ph_SF_eff->at(selph_index1)
           * ph_SF_iso->at(selph_index1)
-          * weight_leptonSF * weight_jvt * event_norm * event_lumi);
+          * weight_leptonSF * weight_jvt * event_norm * event_lumi
+          * ph_kfactor->at(selph_index1));
     }
     newtree_func->Fill();
 
@@ -54,15 +55,14 @@ int main(int argc, char** argv)
   //gROOT->ProcessLine( "gErrorIgnoreLevel = kFatal;");
   std::cout << "Found " << argc-1 << " files to run over:" << std::endl;
 
-  // string path = "root://eosuser//eos/user/j/jwsmith2/reprocessedNtuples/v009_flattened/CR1S/";
-  string path = "/eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v009_flattened/CR1S/";
+  string path = "root://eosatlas//eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v010/CR1S/";
 
-  string channels[] ={"mujets"};
+  string channels[] ={"ejets"};
   // Where we save to:
   // Remember to make the directory. I.e. mkdir ../SR1 ; cd ../SR1 ; mkdir emu mumu etc
   // I'm just too lazy.
   // string outputPath = "root://eosatlas//eos/atlas/user/j/jwsmith/reprocessedNtuples/v009_flattened/SR1S/";
-  string outputPath = "/eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v009_flattened/SR1S/";
+  string outputPath = "./SR1S/";
 
 
   for (int i = 1; i < argc; ++i) {
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
         overlapRemoval="event_photonorigin<10";
       } 
       // ttbar
-      if(filename.find("ttbar") != std::string::npos) {
+      else if(filename.find("ttbar") != std::string::npos) {
         overlapRemoval="event_photonorigin>=10";
       } 
       else{

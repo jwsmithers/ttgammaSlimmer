@@ -86,6 +86,7 @@ vector<float>   *ph_eta= nullptr;
 vector<float>   *ph_phi= nullptr;
 vector<float>   *ph_e= nullptr;
 vector<float>   *ph_iso= nullptr;
+vector<float>   *ph_kfactor= nullptr;
 vector<float>   *jet_pt= nullptr;
 vector<float>   *jet_eta= nullptr;
 vector<float>   *jet_phi= nullptr;
@@ -287,42 +288,15 @@ void activateBranches(TChain *chain){
 	// Activate branches for MC chain
 	#define SETBRANCH(branchName) chain->SetBranchAddress(#branchName,&branchName)
 	// variables
-        SETBRANCH(ph_pt);
 
-	SETBRANCH(ph_ptcone20);
-	SETBRANCH(ph_ptcone30);
-	SETBRANCH(ph_ptcone40);
-
-	SETBRANCH(ph_topoetcone20);
-	SETBRANCH(ph_topoetcone30);
-	SETBRANCH(ph_topoetcone40);
-
-	SETBRANCH(event_ngoodphotons);
-	SETBRANCH(event_nbjets77);
-	SETBRANCH(met_met);
-	SETBRANCH(event_mll);
 	SETBRANCH(ph_isoFCT);
-	SETBRANCH(jet_pt);
-	SETBRANCH(event_mll);
-	SETBRANCH(met_met);
-	SETBRANCH(ph_drlept);
-	SETBRANCH(ph_mgammalept);
-	SETBRANCH(ph_mgammaleptlept);
-	SETBRANCH(ph_drsubljet);
-	SETBRANCH(ph_drleadjet);
-	SETBRANCH(ph_e);
-	SETBRANCH(ph_phi);
-	SETBRANCH(event_mwt);
-	SETBRANCH(event_nbjets77);
-	SETBRANCH(ph_HFT_MVA);
-	SETBRANCH(event_HT);
-	SETBRANCH(event_njets);
 	// misc
 	SETBRANCH(selph_index1);
         SETBRANCH(jet_tagWeightBin);
         SETBRANCH(mcChannelNumber);
         SETBRANCH(event_photonorigin);
 	// Weights
+	SETBRANCH(ph_kfactor);
 	SETBRANCH(weight_mm_ejets);
 	SETBRANCH(weight_mm_mujets);
         SETBRANCH(weights_mm_ejets);
