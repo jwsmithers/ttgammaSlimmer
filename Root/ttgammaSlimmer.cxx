@@ -32,7 +32,7 @@ void m_add_branches(
 
 
     total_events_unweighted=total_events_unweighted+1;
-    if (filename.find("QCDfakes") != std::string::npos) {
+    if (filename.find("fake_CR1") != std::string::npos) {
          total_events = total_events+1*weights_mm_ejets->at(17) + 1*weights_mm_mujets->at(75);
     } else {
       total_events = total_events + 1 * (weight_mc * weight_pileup
@@ -55,14 +55,13 @@ int main(int argc, char** argv)
   //gROOT->ProcessLine( "gErrorIgnoreLevel = kFatal;");
   std::cout << "Found " << argc-1 << " files to run over:" << std::endl;
 
-  string path = "root://eosatlas//eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v010/CR1S/";
+  string path = "root://eosatlas//eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v010_production/QE2/";
 
-  string channels[] ={"ejets"};
+  string channels[] ={"mujets"};
   // Where we save to:
   // Remember to make the directory. I.e. mkdir ../SR1 ; cd ../SR1 ; mkdir emu mumu etc
   // I'm just too lazy.
-  // string outputPath = "root://eosatlas//eos/atlas/user/j/jwsmith/reprocessedNtuples/v009_flattened/SR1S/";
-  string outputPath = "./SR1S/";
+  string outputPath = "root://eosatlas//eos/atlas/atlascerngroupdisk/phys-top/toproperties/ttgamma/v010_production/QE2_cut/";
 
 
   for (int i = 1; i < argc; ++i) {
@@ -84,19 +83,10 @@ int main(int argc, char** argv)
       if (c.find("ejets") != std::string::npos) {
         // Direct SR cuts
         cut="selph_index1 >=0 && event_ngoodphotons==1 && event_njets >= 4 && event_nbjets77 >= 1 && abs(ph_mgammalept[selph_index1] - 91188) > 5000 && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
-        // QE2 cuts
-        //cut=" ((ejets_2015 && (HLT_e24_lhmedium_L1EM20VH || HLT_e60_lhmedium || HLT_e120_lhloose)) || (ejets_2016 && ((HLT_e26_lhtight_nod0_ivarloose && el_pt[0] < 61000.) || ((HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0) && el_pt[0] > 61000)))) && (selph_index1 >=0 && event_ngoodphotons==1 && event_njets >= 4 && event_nbjets77 >= 1 && abs(ph_mgammalept[selph_index1] - 91188) > 5000 && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1])";
-        // QE2 cuts Benedikt
-        // cut=" ((ejets_2015 && (HLT_e24_lhmedium_L1EM20VH || HLT_e60_lhmedium || HLT_e120_lhloose)) || (ejets_2016 && ((HLT_e26_lhtight_nod0_ivarloose && el_pt[0] < 61000.) || ((HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0) && el_pt[0] > 61000))))";
-
       }
       if (c.find("mujets") != std::string::npos) {
         // Direct SR cuts
         cut="selph_index1 >=0 && event_ngoodphotons==1 && event_njets >= 4 && event_nbjets77 >= 1 && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
-        // QE2 cuts
-        //cut="((mujets_2015 && (HLT_mu20_iloose_L1MU15 || HLT_mu50)) || (mujets_2016 && ((HLT_mu24 && mu_pt[0] < 51000.) || (HLT_mu50 && mu_pt[0] > 51000.)))) && (selph_index1 >=0 && event_ngoodphotons==1 && event_njets >= 4 && event_nbjets77 >= 1 && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1])";
-        // QE2 cuts Benedikt
-        // cut="((mujets_2015 && (HLT_mu20_iloose_L1MU15 || HLT_mu50)) || (mujets_2016 && ((HLT_mu24 && mu_pt[0] < 51000.) || (HLT_mu50 && mu_pt[0] > 51000.))))";
       }
       if (c.find("ee") != std::string::npos) {
         cut="selph_index1 >=0 && event_ngoodphotons == 1 && event_njets >= 2 && event_nbjets77 >= 1 && met_met > 30000 && (event_mll < 85000 || event_mll > 95000) && (ph_mgammaleptlept[selph_index1] < 85000 || ph_mgammaleptlept[selph_index1] > 95000) && ph_drlept[selph_index1] > 1.0 && ph_isoFCT[selph_index1]";
