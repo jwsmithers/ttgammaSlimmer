@@ -1,5 +1,4 @@
 # CMakeLists.txt for event package. It creates a library with dictionary and a main program
-set(CMAKE_C_COMPILER /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/Gcc/gcc493_x86_64_slc6/slc6/gcc49/bin/gcc)
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(ttgammaSlimmer)
 include_directories(include)
